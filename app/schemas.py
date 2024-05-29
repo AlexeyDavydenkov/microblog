@@ -1,21 +1,5 @@
+from typing import List, Optional, Dict, Union
 from pydantic import BaseModel
-from typing import List, Optional
-
-
-class TweetBase(BaseModel):
-    content: str
-
-
-class TweetCreate(TweetBase):
-    pass
-
-
-class Tweet(TweetBase):
-    id: int
-    owner_id: int
-
-    class Config:
-        orm_mode = True
 
 
 class UserBase(BaseModel):
@@ -26,37 +10,82 @@ class UserCreate(UserBase):
     pass
 
 
+class User(UserBase):
+    id: int
+    api_key: str
+
+    class Config:
+        orm_mode = True
+
+
 class Follower(BaseModel):
     id: int
     name: str
 
+    class Config:
+        orm_mode = True
 
-class User(UserBase):
+
+class Following(BaseModel):
     id: int
     name: str
-    followers: List[Follower]
-    following: List[Follower]
 
     class Config:
         orm_mode = True
 
 
-class ResponseModel(BaseModel):
-    result: str
-    user: User
+class UserProfile(BaseModel):
+    id: int
+    name: str
+    followers: List[Follower] = []
+    following: List[Following] = []
+
+    class Config:
+        orm_mode = True
 
 
-class LikeBase(BaseModel):
-    pass
+class UserProfileResponse(BaseModel):
+    result: bool
+    user: UserProfile
 
 
-class LikeCreate(LikeBase):
-    user_id: int
+class TweetCreate(BaseModel):
+    tweet_data: str
+    tweet_media_ids: Optional[List[int]] = None
+
+
+class TweetResponse(BaseModel):
+    result: bool
     tweet_id: int
 
 
-class Like(LikeBase):
-    id: int
+class MediaUploadResponse(BaseModel):
+    result: bool
+    media_id: int
 
-    class Config:
-        orm_mode = True
+
+class TweetAuthor(BaseModel):
+    id: int
+    name: str
+
+
+class TweetLike(BaseModel):
+    user_id: int
+    name: str
+
+
+class Tweet(BaseModel):
+    id: int
+    content: str
+    attachments: Optional[List[str]]
+    author: TweetAuthor
+    likes: Optional[List[TweetLike]]
+
+
+class TweetListResponse(BaseModel):
+    result: bool
+    tweets: List[Tweet]
+
+
+class StatusResponse(BaseModel):
+    result: bool

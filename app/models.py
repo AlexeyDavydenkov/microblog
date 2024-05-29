@@ -1,6 +1,7 @@
 from sqlalchemy import Column, Integer, String, ForeignKey, Table
-from sqlalchemy.orm import relationship
-from app.db import Base
+from sqlalchemy.orm import relationship, Session
+from app.base import Base
+
 
 follows = Table(
     'follows', Base.metadata,
@@ -10,6 +11,7 @@ follows = Table(
 
 
 class User(Base):
+    """Модель пользователя"""
     __tablename__ = 'users'
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, index=True)
@@ -30,17 +32,33 @@ class User(Base):
 
 
 class Tweet(Base):
+    """Модель твита"""
     __tablename__ = 'tweets'
     id = Column(Integer, primary_key=True, index=True)
     content = Column(String, index=True)
     owner_id = Column(Integer, ForeignKey('users.id'))
     owner = relationship('User', back_populates='tweets')
     likes = relationship('Like', back_populates='tweet')
+    media = relationship('Media', back_populates='tweet', cascade='all, delete-orphan')
 
 
 class Like(Base):
+    """Модель лайка"""
     __tablename__ = 'likes'
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey('users.id'))
     tweet_id = Column(Integer, ForeignKey('tweets.id'))
     tweet = relationship('Tweet', back_populates='likes')
+    user = relationship('User')
+
+
+class Media(Base):
+    """Модель медиа"""
+    __tablename__ = 'media'
+    id = Column(Integer, primary_key=True, index=True)
+    url = Column(String, index=True)
+    tweet_id = Column(Integer, ForeignKey('tweets.id'))
+    tweet = relationship('Tweet', back_populates='media')
+
+
+
