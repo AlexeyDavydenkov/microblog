@@ -48,9 +48,12 @@ async def create_tweet(tweet: TweetCreate, api_key: Optional[str] = Header(None)
         Создает новый твит
         :param:
             api-key: str
+            tweet_data: str
+            tweet_media_ids: []
         :return:
             json: id созданного твита
     """
+    print(f"Received API Key: {api_key}")
     if not api_key:
         raise HTTPException(status_code=400, detail="API Key is required")
     user = crud.get_user_by_api_key(db, api_key=api_key)
